@@ -44,7 +44,7 @@ export const Settings = () => {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-4xl">
+    <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex items-center gap-2 mb-8">
         <SettingsIcon className="h-6 w-6 text-primary" />
         <h1 className="text-3xl font-bold">Settings</h1>
@@ -52,7 +52,7 @@ export const Settings = () => {
 
       <div className="space-y-8">
         {/* API Configuration */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+        <Card className="p-6 bg-card shadow-card border border-border">
           <div className="flex items-center gap-2 mb-4">
             <Key className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-semibold">API Configuration</h2>
@@ -81,7 +81,7 @@ export const Settings = () => {
         </Card>
 
         {/* Scraping Configuration */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+        <Card className="p-6 bg-card shadow-card border border-border">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-semibold">Scraping Configuration</h2>
@@ -120,7 +120,7 @@ export const Settings = () => {
         </Card>
 
         {/* Data Management */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+        <Card className="p-6 bg-card shadow-card border border-border">
           <div className="flex items-center gap-2 mb-4">
             <Database className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-semibold">Data Management</h2>
@@ -176,7 +176,7 @@ export const Settings = () => {
         </Card>
 
         {/* Security */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+        <Card className="p-6 bg-card shadow-card border border-border">
           <div className="flex items-center gap-2 mb-4">
             <Shield className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-semibold">Security & Privacy</h2>
@@ -203,7 +203,7 @@ export const Settings = () => {
         <div className="flex justify-end">
           <Button 
             onClick={handleSaveSettings}
-            className="bg-gradient-primary hover:shadow-elegant transition-smooth px-8"
+            className="bg-primary hover:bg-primary/90 transition-smooth px-8"
             size="lg"
           >
             Save Settings

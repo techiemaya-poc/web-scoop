@@ -33,7 +33,7 @@ export const SearchForm = ({ onSearch }: SearchFormProps) => {
   };
 
   return (
-    <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+    <Card className="p-6 bg-card shadow-card border border-border">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex items-center gap-2 mb-4">
           <Search className="h-5 w-5 text-primary" />
@@ -124,7 +124,7 @@ export const SearchForm = ({ onSearch }: SearchFormProps) => {
 
         <Button 
           type="submit" 
-          className="w-full bg-gradient-primary hover:shadow-elegant transition-smooth"
+          className="w-full bg-primary hover:bg-primary/90 transition-smooth"
           size="lg"
         >
           <Search className="h-4 w-4 mr-2" />

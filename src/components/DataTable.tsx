@@ -85,7 +85,7 @@ export const DataTable = () => {
   };
 
   return (
-    <Card className="p-6 bg-gradient-card backdrop-blur-sm shadow-card">
+    <Card className="p-6 bg-card shadow-card border border-border">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
