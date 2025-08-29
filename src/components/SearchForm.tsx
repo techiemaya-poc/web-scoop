@@ -1,10 +1,17 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, MapPin, Filter, Search } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Typography,
+} from "@mui/material";
+import { Search } from "@mui/icons-material";
 
 interface SearchFormProps {
   onSearch: (params: SearchParams) => void;
@@ -18,13 +25,13 @@ export interface SearchParams {
   engagementLevel: string;
 }
 
-export const SearchForm = ({ onSearch }: SearchFormProps) => {
+export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [params, setParams] = useState<SearchParams>({
-    keywords: '',
-    location: '',
-    platform: '',
-    dateRange: '',
-    engagementLevel: ''
+    keywords: "",
+    location: "",
+    platform: "all",
+    dateRange: "7d",
+    engagementLevel: "all",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,105 +39,107 @@ export const SearchForm = ({ onSearch }: SearchFormProps) => {
     onSearch(params);
   };
 
+  const handleChange = (field: keyof SearchParams) => (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { target: { value: unknown } }
+  ) => {
+    setParams(prev => ({
+      ...prev,
+      [field]: event.target.value as string
+    }));
+  };
+
   return (
-    <Card className="p-6 bg-card shadow-card border border-border">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Search className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Search Parameters</h2>
-        </div>
+    <Card>
+      <CardContent>
+        <Box component="form" onSubmit={handleSubmit}>
+          <Typography variant="h6" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+            Social Media Intelligence Search
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Configure your search parameters to find relevant leads across social platforms.
+          </Typography>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="keywords">Keywords</Label>
-            <Input
-              id="keywords"
-              placeholder="Enter keywords to search for..."
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 3,
+            mb: 3
+          }}>
+            <TextField
+              fullWidth
+              label="Keywords"
+              placeholder="e.g., CRM, project management, marketing automation"
               value={params.keywords}
-              onChange={(e) => setParams(prev => ({ ...prev, keywords: e.target.value }))}
-              className="transition-smooth focus:shadow-glow"
+              onChange={handleChange('keywords')}
+              variant="outlined"
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location" className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
-              Location
-            </Label>
-            <Input
-              id="location"
-              placeholder="City, Country, or Region"
+            <TextField
+              fullWidth
+              label="Location (Optional)"
+              placeholder="e.g., San Francisco, New York"
               value={params.location}
-              onChange={(e) => setParams(prev => ({ ...prev, location: e.target.value }))}
-              className="transition-smooth focus:shadow-glow"
+              onChange={handleChange('location')}
+              variant="outlined"
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label>Platform</Label>
-            <Select value={params.platform} onValueChange={(value) => setParams(prev => ({ ...prev, platform: value }))}>
-              <SelectTrigger className="transition-smooth focus:shadow-glow">
-                <SelectValue placeholder="Select platform" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="twitter">Twitter/X</SelectItem>
-                <SelectItem value="instagram">Instagram</SelectItem>
-                <SelectItem value="facebook">Facebook</SelectItem>
-                <SelectItem value="linkedin">LinkedIn</SelectItem>
-                <SelectItem value="reddit">Reddit</SelectItem>
-                <SelectItem value="tiktok">TikTok</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <FormControl fullWidth>
+              <InputLabel>Platform</InputLabel>
+              <Select
+                value={params.platform}
+                label="Platform"
+                onChange={handleChange('platform')}
+              >
+                <MenuItem value="all">All Platforms</MenuItem>
+                <MenuItem value="twitter">Twitter</MenuItem>
+                <MenuItem value="linkedin">LinkedIn</MenuItem>
+                <MenuItem value="facebook">Facebook</MenuItem>
+                <MenuItem value="reddit">Reddit</MenuItem>
+              </Select>
+            </FormControl>
 
-          <div className="space-y-2">
-            <Label className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              Date Range
-            </Label>
-            <Select value={params.dateRange} onValueChange={(value) => setParams(prev => ({ ...prev, dateRange: value }))}>
-              <SelectTrigger className="transition-smooth focus:shadow-glow">
-                <SelectValue placeholder="Select date range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="24h">Last 24 hours</SelectItem>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="custom">Custom range</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <FormControl fullWidth>
+              <InputLabel>Date Range</InputLabel>
+              <Select
+                value={params.dateRange}
+                label="Date Range"
+                onChange={handleChange('dateRange')}
+              >
+                <MenuItem value="1d">Last 24 Hours</MenuItem>
+                <MenuItem value="7d">Last 7 Days</MenuItem>
+                <MenuItem value="30d">Last 30 Days</MenuItem>
+                <MenuItem value="90d">Last 90 Days</MenuItem>
+              </Select>
+            </FormControl>
 
-          <div className="space-y-2 md:col-span-2">
-            <Label className="flex items-center gap-1">
-              <Filter className="h-4 w-4" />
-              Engagement Level
-            </Label>
-            <Select value={params.engagementLevel} onValueChange={(value) => setParams(prev => ({ ...prev, engagementLevel: value }))}>
-              <SelectTrigger className="transition-smooth focus:shadow-glow">
-                <SelectValue placeholder="Select engagement level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any engagement</SelectItem>
-                <SelectItem value="low">Low (1-10 interactions)</SelectItem>
-                <SelectItem value="medium">Medium (11-100 interactions)</SelectItem>
-                <SelectItem value="high">High (100+ interactions)</SelectItem>
-                <SelectItem value="viral">Viral (1000+ interactions)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+            <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
+              <FormControl fullWidth>
+                <InputLabel>Engagement Level</InputLabel>
+                <Select
+                  value={params.engagementLevel}
+                  label="Engagement Level"
+                  onChange={handleChange('engagementLevel')}
+                >
+                  <MenuItem value="all">All Levels</MenuItem>
+                  <MenuItem value="high">High (50+ interactions)</MenuItem>
+                  <MenuItem value="medium">Medium (10-49 interactions)</MenuItem>
+                  <MenuItem value="low">Low (1-9 interactions)</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
 
-        <Button 
-          type="submit" 
-          className="w-full bg-primary hover:bg-primary/90 transition-smooth"
-          size="lg"
-        >
-          <Search className="h-4 w-4 mr-2" />
-          Start Scraping
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            startIcon={<Search />}
+            sx={{ minWidth: 200 }}
+          >
+            Start Scraping
+          </Button>
+        </Box>
+      </CardContent>
     </Card>
   );
 };

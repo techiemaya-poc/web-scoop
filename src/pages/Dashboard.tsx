@@ -1,10 +1,24 @@
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SearchForm, SearchParams } from '@/components/SearchForm';
-import { DataTable } from '@/components/DataTable';
-import { LeadCategories } from '@/components/LeadCategories';
-import { BarChart3, Users, Search, Download, TrendingUp, Clock } from 'lucide-react';
-import heroImage from '@/assets/hero-image.jpg';
+import React from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Avatar,
+} from "@mui/material";
+import {
+  TrendingUp,
+  People,
+  Timeline,
+  Speed,
+  Search,
+  Download,
+  QueryStats,
+} from "@mui/icons-material";
+import { SearchForm, SearchParams } from "@/components/SearchForm";
+import { LeadCategories } from "@/components/LeadCategories";
+import { DataTable } from "@/components/DataTable";
 
 const mockData = [
   {
@@ -53,97 +67,107 @@ const mockData = [
   }
 ];
 
+// Stats data
 const stats = [
   {
-    title: 'Total Profiles Scraped',
-    value: '12,847',
-    change: '+12%',
-    icon: Users,
-    trend: 'up'
+    title: "Total Leads",
+    value: "2,847",
+    change: "+12.5%",
+    icon: <People />,
   },
   {
-    title: 'Active Scraping Jobs',
-    value: '3',
-    change: '+1',
-    icon: Search,
-    trend: 'up'
+    title: "Hot Leads",
+    value: "342",
+    change: "+23.1%",
+    icon: <TrendingUp />,
   },
   {
-    title: 'Data Exports',
-    value: '156',
-    change: '+8%',
-    icon: Download,
-    trend: 'up'
+    title: "Conversion Rate",
+    value: "18.2%",
+    change: "+3.2%",
+    icon: <Timeline />,
   },
   {
-    title: 'Processing Time',
-    value: '2.3s',
-    change: '-15%',
-    icon: Clock,
-    trend: 'down'
-  }
+    title: "Avg. Response Time",
+    value: "2.4h",
+    change: "-15.3%",
+    icon: <Speed />,
+  },
 ];
 
-export const Dashboard = () => {
+export const Dashboard: React.FC = () => {
   const handleSearch = (params: SearchParams) => {
-    console.log('Search params:', params);
-    // Search functionality will be implemented with backend
+    console.log("Search params:", params);
   };
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Social Media Intelligence Platform
-        </h1>
-        <p className="text-muted-foreground">
-          Scrape, analyze, and export social media data with advanced filtering and real-time insights
-        </p>
-      </div>
+    <Box sx={{ p: 0 }}>
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
+          Welcome back! 👋
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Here's what's happening with your social media intelligence today.
+        </Typography>
+      </Box>
 
-      <div className="space-y-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.title} className="p-6 bg-card shadow-card transition-smooth hover:shadow-elegant border border-border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
-                    <p className="text-3xl font-bold mt-1 text-foreground">{stat.value}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      <TrendingUp className={`h-4 w-4 ${stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
-                      <span className={`text-sm font-medium ${stat.trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
-                        {stat.change} from last month
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+      {/* Stats Grid */}
+      <Box sx={{ 
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
+        gap: 3,
+        mb: 4 
+      }}>
+        {stats.map((stat) => (
+          <Card key={stat.title}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                  {stat.icon}
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="div" sx={{ fontWeight: 600 }}>
+                    {stat.value}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {stat.title}
+                  </Typography>
+                </Box>
+              </Box>
+              <Chip
+                label={stat.change}
+                color={stat.change.startsWith('+') ? 'success' : 'error'}
+                size="small"
+                variant="outlined"
+              />
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
 
-        {/* Search Form */}
+      {/* Search Form */}
+      <Box sx={{ mb: 4 }}>
         <SearchForm onSearch={handleSearch} />
+      </Box>
 
-        {/* Lead Categories */}
+      {/* Lead Categories */}
+      <Box sx={{ mb: 4 }}>
         <LeadCategories data={mockData} />
+      </Box>
 
-        {/* Recent Results */}
-        <div>
-          <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-semibold">Recent Results</h2>
-          </div>
+      {/* Recent Results */}
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <QueryStats sx={{ color: 'primary.main' }} />
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              Recent Scraping Results
+            </Typography>
+          </Box>
           <DataTable data={mockData} />
-        </div>
-      </div>
-    </div>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };

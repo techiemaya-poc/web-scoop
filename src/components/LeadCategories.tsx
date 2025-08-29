@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Flame, Snowflake, Thermometer, TrendingUp, Eye, Users, ArrowLeft, ExternalLink } from 'lucide-react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Avatar,
+  IconButton,
+  Link,
+} from '@mui/material';
+import {
+  LocalFireDepartment,
+  AcUnit,
+  DeviceThermostat,
+  TrendingUp,
+  Groups,
+  ArrowBack,
+  OpenInNew,
+} from '@mui/icons-material';
 
 interface Lead {
   id: string;
@@ -67,7 +85,7 @@ interface LeadCategoriesProps {
   data: any[];
 }
 
-export const LeadCategories = ({ data }: LeadCategoriesProps) => {
+export const LeadCategories: React.FC<LeadCategoriesProps> = ({ data }) => {
   const [selectedCategory, setSelectedCategory] = useState<'hot' | 'warm' | 'cold' | null>(null);
   const categorizedLeads = categorizeLeads(data);
   
@@ -77,19 +95,19 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
   
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'hot': return Flame;
-      case 'warm': return Thermometer;
-      case 'cold': return Snowflake;
-      default: return Users;
+      case 'hot': return LocalFireDepartment;
+      case 'warm': return DeviceThermostat;
+      case 'cold': return AcUnit;
+      default: return Groups;
     }
   };
   
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'hot': return 'text-red-500 bg-red-50 border-red-200';
-      case 'warm': return 'text-orange-500 bg-orange-50 border-orange-200';
-      case 'cold': return 'text-blue-500 bg-blue-50 border-blue-200';
-      default: return 'text-muted-foreground bg-muted border-border';
+      case 'hot': return 'error';
+      case 'warm': return 'warning';
+      case 'cold': return 'info';
+      default: return 'default';
     }
   };
 
@@ -99,21 +117,21 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
       leads: hotLeads,
       category: 'hot' as const,
       description: 'High urgency, ready to engage',
-      color: 'text-red-500'
+      color: 'error.main'
     },
     {
       name: 'Warm Leads',
       leads: warmLeads,
       category: 'warm' as const, 
       description: 'Interested, needs nurturing',
-      color: 'text-orange-500'
+      color: 'warning.main'
     },
     {
       name: 'Cold Leads',
       leads: coldLeads,
       category: 'cold' as const,
       description: 'Low urgency, long-term prospects',
-      color: 'text-blue-500'
+      color: 'info.main'
     }
   ];
 
@@ -123,144 +141,171 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <TrendingUp className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-semibold">Lead Categories</h2>
-      </div>
+    <Box sx={{ mb: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+        <TrendingUp sx={{ color: 'primary.main' }} />
+        <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+          Lead Categories
+        </Typography>
+      </Box>
       
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Box sx={{ 
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+        gap: 3
+      }}>
         {categories.map((categoryData) => {
           const Icon = getCategoryIcon(categoryData.category);
           return (
             <Card 
               key={categoryData.category} 
-              className="p-6 bg-card shadow-card border border-border cursor-pointer hover:shadow-elegant transition-all duration-300 hover:scale-105"
+              sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 4
+                }
+              }}
               onClick={() => setSelectedCategory(categoryData.category)}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getCategoryColor(categoryData.category)}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">{categoryData.name}</h3>
-                    <p className="text-sm text-muted-foreground">{categoryData.description}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-2xl font-bold ${categoryData.color}`}>
-                    {categoryData.leads.length}
-                  </div>
-                  <p className="text-sm text-muted-foreground">leads</p>
-                </div>
-              </div>
-              <div className="text-center">
-                <Button variant="outline" size="sm" className="w-full">
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar sx={{ bgcolor: categoryData.color }}>
+                      <Icon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" component="h3" sx={{ fontWeight: 600 }}>
+                        {categoryData.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {categoryData.description}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 600, color: categoryData.color }}>
+                      {categoryData.leads.length}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      leads
+                    </Typography>
+                  </Box>
+                </Box>
+                <Button variant="outlined" fullWidth>
                   View Details
                 </Button>
-              </div>
+              </CardContent>
             </Card>
           );
         })}
-      </div>
+      </Box>
 
       {/* Lead Details Modal */}
-      <Dialog open={selectedCategory !== null} onOpenChange={(open) => !open && setSelectedCategory(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-          <DialogHeader>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedCategory(null)}
-                className="mr-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              {selectedCategory && (
-                <>
-                  {React.createElement(getCategoryIcon(selectedCategory), { 
-                    className: `h-6 w-6 ${categories.find(c => c.category === selectedCategory)?.color}` 
-                  })}
-                  <DialogTitle className="text-xl">
-                    {categories.find(c => c.category === selectedCategory)?.name} ({getSelectedLeads().length})
-                  </DialogTitle>
-                </>
-              )}
-            </div>
-          </DialogHeader>
-          
-          <div className="overflow-y-auto max-h-[60vh] pr-2">
-            <div className="space-y-4">
-              {getSelectedLeads().map((lead) => (
-                <Card key={lead.id} className="p-4 border border-border">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Users className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground">{lead.username}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary">{lead.platform}</Badge>
-                          <Badge variant={lead.category === 'hot' ? 'destructive' : lead.category === 'warm' ? 'default' : 'outline'}>
-                            {lead.category}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">{lead.engagement.toLocaleString()}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Score: <span className="font-bold">{lead.urgencyScore.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </div>
+      <Dialog 
+        open={selectedCategory !== null} 
+        onClose={() => setSelectedCategory(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <IconButton
+              onClick={() => setSelectedCategory(null)}
+              sx={{ mr: 1 }}
+            >
+              <ArrowBack />
+            </IconButton>
+            {selectedCategory && (
+              <>
+                {React.createElement(getCategoryIcon(selectedCategory), { 
+                  sx: { color: categories.find(c => c.category === selectedCategory)?.color }
+                })}
+                <Typography variant="h6" component="h2">
+                  {categories.find(c => c.category === selectedCategory)?.name} ({getSelectedLeads().length})
+                </Typography>
+              </>
+            )}
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {getSelectedLeads().map((lead) => (
+              <Card key={lead.id} variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ bgcolor: 'primary.main' }}>
+                        <Groups />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" component="h4" sx={{ fontWeight: 600 }}>
+                          {lead.username}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                          <Chip label={lead.platform} size="small" variant="outlined" />
+                          <Chip 
+                            label={lead.category} 
+                            size="small" 
+                            color={getCategoryColor(lead.category)}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <TrendingUp sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {lead.engagement.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        Score: <strong>{lead.urgencyScore.toFixed(1)}</strong>
+                      </Typography>
+                    </Box>
+                  </Box>
                   
-                  <div className="bg-muted/30 rounded-lg p-3 mb-3">
-                    <p className="text-sm text-foreground leading-relaxed">
+                  <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2, mb: 2 }}>
+                    <Typography variant="body2" sx={{ lineHeight: 1.6 }}>
                       {lead.content}
-                    </p>
-                  </div>
+                    </Typography>
+                  </Box>
                   
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="text.secondary">
                       Platform: {lead.platform}
-                    </div>
+                    </Typography>
                     <Button
-                      size="sm"
-                      variant="outline"
+                      size="small"
+                      variant="outlined"
+                      startIcon={<OpenInNew />}
                       onClick={() => window.open(lead.profileUrl, '_blank')}
-                      className="flex items-center gap-2"
                     >
-                      <ExternalLink className="h-3 w-3" />
                       View Profile
                     </Button>
-                  </div>
-                </Card>
-              ))}
-              
-              {getSelectedLeads().length === 0 && selectedCategory && (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    {React.createElement(getCategoryIcon(selectedCategory), { 
-                      className: 'h-8 w-8 text-muted-foreground' 
-                    })}
-                  </div>
-                  <p className="text-muted-foreground">
-                    No {selectedCategory} leads found
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {getSelectedLeads().length === 0 && selectedCategory && (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Avatar sx={{ bgcolor: 'grey.100', width: 64, height: 64, mx: 'auto', mb: 2 }}>
+                  {React.createElement(getCategoryIcon(selectedCategory), { 
+                    sx: { fontSize: '2rem', color: 'text.secondary' }
+                  })}
+                </Avatar>
+                <Typography color="text.secondary">
+                  No {selectedCategory} leads found
+                </Typography>
+              </Box>
+            )}
+          </Box>
         </DialogContent>
       </Dialog>
-    </div>
+    </Box>
   );
 };

@@ -1,31 +1,30 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { SnackbarProvider } from 'notistack';
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopHeader } from "@/components/TopHeader";
 import { Dashboard } from "./pages/Dashboard";
 import { Settings } from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { theme } from "./theme/theme";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full bg-background">
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <SnackbarProvider maxSnack={3}>
+        <BrowserRouter>
+          <div style={{ display: 'flex', minHeight: '100vh' }}>
             <AppSidebar />
             
-            <div className="flex-1 flex flex-col">
+            <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
               <TopHeader />
               
-              <main className="flex-1 p-6">
+              <main style={{ flexGrow: 1, padding: '24px' }}>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/scraper" element={<Dashboard />} />
@@ -36,15 +35,14 @@ const App = () => (
                   <Route path="/conversations" element={<Dashboard />} />
                   <Route path="/workspace" element={<Dashboard />} />
                   <Route path="/settings" element={<Settings />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
             </div>
           </div>
-        </SidebarProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+        </BrowserRouter>
+      </SnackbarProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

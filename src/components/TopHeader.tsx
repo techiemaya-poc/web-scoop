@@ -1,48 +1,132 @@
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Bell, Mail, Sun } from "lucide-react";
+import React from 'react';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  Badge,
+  Avatar,
+  InputBase,
+  Chip,
+} from '@mui/material';
+import {
+  Search,
+  Notifications,
+  AccountCircle,
+  LightMode,
+  Email,
+} from '@mui/icons-material';
+import { styled, alpha } from '@mui/material/styles';
+
+const SearchBox = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: 16,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '20ch',
+      '&:focus': {
+        width: '30ch',
+      },
+    },
+  },
+}));
 
 export function TopHeader() {
   const userName = "Admin User";
   const userRole = "Project Manager";
 
   return (
-    <header className="h-16 bg-background border-b border-border flex items-center justify-between px-6">
-      <div className="flex items-center gap-4">
-        <SidebarTrigger className="h-8 w-8" />
-        <div>
-          <h1 className="text-lg font-medium text-foreground">
-            Hello {userName} 👋
-          </h1>
-          <p className="text-sm text-muted-foreground">Good Morning...!</p>
-        </div>
-      </div>
+    <AppBar
+      position="static"
+      sx={{
+        backgroundColor: 'background.paper',
+        color: 'text.primary',
+        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+              Hello {userName} 👋
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+              Good Morning...!
+            </Typography>
+          </Box>
+        </Box>
 
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Sun className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Bell className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Mail className="h-4 w-4" />
-        </Button>
-        
-        <div className="flex items-center gap-2 ml-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-avatar.jpg" alt={userName} />
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {userName.split(' ').map(n => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
-          <div className="hidden sm:block">
-            <p className="text-sm font-medium text-foreground">{userName}</p>
-            <p className="text-xs text-muted-foreground">{userRole}</p>
-          </div>
-        </div>
-      </div>
-    </header>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SearchBox>
+            <SearchIconWrapper>
+              <Search />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search leads, posts..."
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </SearchBox>
+
+          <IconButton size="large" color="inherit">
+            <LightMode />
+          </IconButton>
+
+          <IconButton size="large" color="inherit">
+            <Badge badgeContent={4} color="error">
+              <Notifications />
+            </Badge>
+          </IconButton>
+
+          <IconButton size="large" color="inherit">
+            <Email />
+          </IconButton>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
+            <Avatar sx={{ width: 32, height: 32 }}>
+              <AccountCircle />
+            </Avatar>
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.875rem' }}>
+                {userName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {userRole}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

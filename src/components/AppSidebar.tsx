@@ -1,92 +1,138 @@
-import { NavLink, useLocation } from "react-router-dom";
+import React, { useState } from 'react';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { 
-  Home, 
-  Search, 
-  Database, 
-  MessageSquare, 
-  Users, 
-  BarChart3, 
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  IconButton,
+  Typography,
+} from '@mui/material';
+import {
+  Home,
+  Search,
+  DataObject,
+  Analytics,
+  FolderOpen,
+  Contacts,
+  Chat,
+  WorkOutline,
   Settings,
-  Briefcase,
-  Monitor
-} from "lucide-react";
+  Menu,
+  ChevronLeft,
+} from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const items = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Scraper", url: "/scraper", icon: Search },
-  { title: "Data Manager", url: "/data", icon: Database },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Projects", url: "/projects", icon: Briefcase },
-  { title: "Contacts", url: "/contacts", icon: Users },
-  { title: "Conversations", url: "/conversations", icon: MessageSquare },
-  { title: "Workspace", url: "/workspace", icon: Monitor },
-  { title: "Settings", url: "/settings", icon: Settings },
+const drawerWidth = 280;
+
+const menuItems = [
+  { text: 'Dashboard', icon: <Home />, path: '/' },
+  { text: 'Scraper', icon: <Search />, path: '/scraper' },
+  { text: 'Data', icon: <DataObject />, path: '/data' },
+  { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
+  { text: 'Projects', icon: <FolderOpen />, path: '/projects' },
+  { text: 'Contacts', icon: <Contacts />, path: '/contacts' },
+  { text: 'Conversations', icon: <Chat />, path: '/conversations' },
+  { text: 'Workspace', icon: <WorkOutline />, path: '/workspace' },
+  { text: 'Settings', icon: <Settings />, path: '/settings' },
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
-  const currentPath = location.pathname;
 
-  const isActive = (path: string) => currentPath === path;
-  const isCollapsed = state === "collapsed";
+  const toggleCollapsed = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   return (
-    <Sidebar className={isCollapsed ? "w-14" : "w-64"} collapsible="icon">
-      <SidebarContent className="bg-sidebar">
-        <div className="p-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Search className="h-4 w-4 text-primary-foreground" />
-            </div>
-            {!isCollapsed && (
-              <div>
-                <span className="font-bold text-lg text-sidebar-foreground">TechMaya</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const ItemIcon = item.icon;
-                const active = isActive(item.url);
-                
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-smooth ${
-                          active
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-sm"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                        }`}
-                      >
-                        <ItemIcon className="h-5 w-5" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: isCollapsed ? 64 : drawerWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: isCollapsed ? 64 : drawerWidth,
+          boxSizing: 'border-box',
+          transition: 'width 0.3s ease',
+          overflowX: 'hidden',
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isCollapsed ? 'center' : 'space-between',
+          p: 2,
+          minHeight: 64,
+        }}
+      >
+        {!isCollapsed && (
+          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+            TechMaya
+          </Typography>
+        )}
+        <IconButton onClick={toggleCollapsed} size="small">
+          {isCollapsed ? <Menu /> : <ChevronLeft />}
+        </IconButton>
+      </Box>
+      
+      <Divider />
+      
+      <List sx={{ flexGrow: 1, pt: 1 }}>
+        {menuItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              selected={location.pathname === item.path}
+              onClick={() => handleNavigation(item.path)}
+              sx={{
+                px: isCollapsed ? 1 : 2,
+                py: 1,
+                mx: 1,
+                mb: 0.5,
+                borderRadius: 2,
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                  color: 'primary.contrastText',
+                  '& .MuiListItemIcon-root': {
+                    color: 'primary.contrastText',
+                  },
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  },
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: isCollapsed ? 'auto' : 40,
+                  justifyContent: 'center',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              {!isCollapsed && (
+                <ListItemText 
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                />
+              )}
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Drawer>
   );
 }
