@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Filter, Search, ExternalLink, User, MessageCircle } from 'lucide-react';
+import { Download, Filter, Search, ExternalLink, User, MessageCircle, Flame, Thermometer, Snowflake } from 'lucide-react';
 
 interface ScrapedData {
   id: string;
@@ -18,6 +18,39 @@ interface ScrapedData {
   timestamp: string;
   postType: 'post' | 'comment';
 }
+
+interface DataTableProps {
+  data?: ScrapedData[];
+}
+
+// Lead categorization logic
+const categorizeLeadFromContent = (content: string, engagement: number) => {
+  const text = content.toLowerCase();
+  let score = 0;
+  
+  const hotKeywords = ['urgent', 'asap', 'immediate', 'need now', 'looking for', 'hiring', 'budget approved', 'ready to buy'];
+  const warmKeywords = ['interested', 'considering', 'planning', 'researching', 'exploring', 'thinking about'];
+  const coldKeywords = ['maybe', 'someday', 'future', 'not sure', 'just looking'];
+  
+  hotKeywords.forEach(keyword => {
+    if (text.includes(keyword)) score += 3;
+  });
+  
+  warmKeywords.forEach(keyword => {
+    if (text.includes(keyword)) score += 2;
+  });
+  
+  coldKeywords.forEach(keyword => {
+    if (text.includes(keyword)) score -= 1;
+  });
+  
+  if (engagement > 1000) score += 1;
+  if (engagement > 500) score += 0.5;
+  
+  if (score >= 4) return { category: 'hot' as const, score };
+  if (score >= 2) return { category: 'warm' as const, score };
+  return { category: 'cold' as const, score };
+};
 
 const mockData: ScrapedData[] = [
   {
@@ -55,8 +88,8 @@ const mockData: ScrapedData[] = [
   }
 ];
 
-export const DataTable = () => {
-  const [data] = useState<ScrapedData[]>(mockData);
+export const DataTable = ({ data: propData }: DataTableProps) => {
+  const [data] = useState<ScrapedData[]>(propData || mockData);
   const [searchTerm, setSearchTerm] = useState('');
   const [platformFilter, setPlatformFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -150,6 +183,7 @@ export const DataTable = () => {
                 <TableHead>Platform</TableHead>
                 <TableHead>Content Preview</TableHead>
                 <TableHead>Engagement</TableHead>
+                <TableHead>Lead Score</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
@@ -157,7 +191,27 @@ export const DataTable = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedData.map((item) => (
+              {paginatedData.map((item) => {
+                const leadData = categorizeLeadFromContent(item.postContent, item.engagement);
+                const getCategoryIcon = (category: string) => {
+                  switch (category) {
+                    case 'hot': return Flame;
+                    case 'warm': return Thermometer;
+                    case 'cold': return Snowflake;
+                    default: return MessageCircle;
+                  }
+                };
+                const getCategoryColor = (category: string) => {
+                  switch (category) {
+                    case 'hot': return 'text-red-500';
+                    case 'warm': return 'text-orange-500';
+                    case 'cold': return 'text-blue-500';
+                    default: return 'text-muted-foreground';
+                  }
+                };
+                const Icon = getCategoryIcon(leadData.category);
+                
+                return (
                 <TableRow key={item.id} className="hover:bg-muted/30 transition-smooth">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -175,6 +229,20 @@ export const DataTable = () => {
                     <div className="flex items-center gap-1">
                       <MessageCircle className="h-4 w-4 text-muted-foreground" />
                       {item.engagement.toLocaleString()}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Icon className={`h-4 w-4 ${getCategoryColor(leadData.category)}`} />
+                      <Badge 
+                        variant={leadData.category === 'hot' ? 'destructive' : leadData.category === 'warm' ? 'default' : 'secondary'}
+                        className="capitalize"
+                      >
+                        {leadData.category}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {leadData.score.toFixed(1)}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>{item.location || 'N/A'}</TableCell>
@@ -197,7 +265,7 @@ export const DataTable = () => {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              )})}
             </TableBody>
           </Table>
         </div>

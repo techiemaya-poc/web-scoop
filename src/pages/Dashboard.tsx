@@ -2,8 +2,56 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SearchForm, SearchParams } from '@/components/SearchForm';
 import { DataTable } from '@/components/DataTable';
+import { LeadCategories } from '@/components/LeadCategories';
 import { BarChart3, Users, Search, Download, TrendingUp, Clock } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
+
+const mockData = [
+  {
+    id: '1',
+    username: 'tech_guru_2024',
+    platform: 'Twitter',
+    postContent: 'Just launched my new AI startup! Looking for urgent investment and technical partners. Need to scale ASAP!',
+    engagement: 1247,
+    location: 'San Francisco, CA',
+    profileUrl: 'https://twitter.com/tech_guru_2024',
+    timestamp: '2024-01-15T14:30:00Z',
+    postType: 'post' as const
+  },
+  {
+    id: '2',
+    username: 'marketing_pro',
+    platform: 'LinkedIn',
+    postContent: 'Interested in exploring new marketing automation tools for our team. Researching different options.',
+    engagement: 834,
+    location: 'New York, NY',
+    profileUrl: 'https://linkedin.com/in/marketing-pro',
+    timestamp: '2024-01-15T12:15:00Z',
+    postType: 'comment' as const
+  },
+  {
+    id: '3',
+    username: 'data_scientist',
+    platform: 'Reddit',
+    postContent: 'Maybe looking into machine learning solutions someday. Not sure about timeline yet.',
+    engagement: 2156,
+    location: 'London, UK',
+    profileUrl: 'https://reddit.com/u/data_scientist',
+    timestamp: '2024-01-14T18:45:00Z',
+    postType: 'post' as const
+  },
+  {
+    id: '4',
+    username: 'startup_founder',
+    platform: 'Twitter',
+    postContent: 'Hiring immediately! Need experienced developers for our fintech startup. Budget approved, ready to onboard!',
+    engagement: 892,
+    location: 'Austin, TX',
+    profileUrl: 'https://twitter.com/startup_founder',
+    timestamp: '2024-01-14T16:20:00Z',
+    postType: 'post' as const
+  }
+];
 
 const stats = [
   {
@@ -84,13 +132,16 @@ export const Dashboard = () => {
         {/* Search Form */}
         <SearchForm onSearch={handleSearch} />
 
+        {/* Lead Categories */}
+        <LeadCategories data={mockData} />
+
         {/* Recent Results */}
         <div>
           <div className="flex items-center gap-2 mb-6">
             <BarChart3 className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-semibold">Recent Results</h2>
           </div>
-          <DataTable />
+          <DataTable data={mockData} />
         </div>
       </div>
     </div>
