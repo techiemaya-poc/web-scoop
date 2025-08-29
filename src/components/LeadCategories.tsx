@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Flame, Snowflake, Thermometer, TrendingUp, Eye, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Flame, Snowflake, Thermometer, TrendingUp, Eye, Users, ArrowLeft, ExternalLink } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -66,6 +68,7 @@ interface LeadCategoriesProps {
 }
 
 export const LeadCategories = ({ data }: LeadCategoriesProps) => {
+  const [selectedCategory, setSelectedCategory] = useState<'hot' | 'warm' | 'cold' | null>(null);
   const categorizedLeads = categorizeLeads(data);
   
   const hotLeads = categorizedLeads.filter(lead => lead.category === 'hot');
@@ -94,25 +97,30 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
     {
       name: 'Hot Leads',
       leads: hotLeads,
-      category: 'hot',
+      category: 'hot' as const,
       description: 'High urgency, ready to engage',
       color: 'text-red-500'
     },
     {
       name: 'Warm Leads',
       leads: warmLeads,
-      category: 'warm', 
+      category: 'warm' as const, 
       description: 'Interested, needs nurturing',
       color: 'text-orange-500'
     },
     {
       name: 'Cold Leads',
       leads: coldLeads,
-      category: 'cold',
+      category: 'cold' as const,
       description: 'Low urgency, long-term prospects',
       color: 'text-blue-500'
     }
   ];
+
+  const getSelectedLeads = () => {
+    if (!selectedCategory) return [];
+    return categorizedLeads.filter(lead => lead.category === selectedCategory);
+  };
 
   return (
     <div className="space-y-6">
@@ -126,7 +134,11 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
         {categories.map((categoryData) => {
           const Icon = getCategoryIcon(categoryData.category);
           return (
-            <Card key={categoryData.category} className="p-6 bg-card shadow-card border border-border">
+            <Card 
+              key={categoryData.category} 
+              className="p-6 bg-card shadow-card border border-border cursor-pointer hover:shadow-elegant transition-all duration-300 hover:scale-105"
+              onClick={() => setSelectedCategory(categoryData.category)}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getCategoryColor(categoryData.category)}`}>
@@ -144,72 +156,111 @@ export const LeadCategories = ({ data }: LeadCategoriesProps) => {
                   <p className="text-sm text-muted-foreground">leads</p>
                 </div>
               </div>
+              <div className="text-center">
+                <Button variant="outline" size="sm" className="w-full">
+                  View Details
+                </Button>
+              </div>
             </Card>
           );
         })}
       </div>
 
-      {/* Detailed Lead Lists */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {categories.map((categoryData) => {
-          const Icon = getCategoryIcon(categoryData.category);
-          return (
-            <Card key={`${categoryData.category}-details`} className="p-6 bg-card shadow-card border border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Icon className={`h-5 w-5 ${categoryData.color}`} />
-                <h3 className="font-semibold">{categoryData.name}</h3>
-                <Badge variant="outline" className="ml-auto">
-                  {categoryData.leads.length}
-                </Badge>
-              </div>
-              
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {categoryData.leads.slice(0, 5).map((lead) => (
-                  <div key={lead.id} className="p-3 border border-border rounded-lg bg-muted/20 hover:bg-muted/40 transition-smooth">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="font-medium text-sm">{lead.username}</p>
-                        <Badge variant="secondary" className="text-xs">
-                          {lead.platform}
-                        </Badge>
+      {/* Lead Details Modal */}
+      <Dialog open={selectedCategory !== null} onOpenChange={(open) => !open && setSelectedCategory(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedCategory(null)}
+                className="mr-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              {selectedCategory && (
+                <>
+                  {React.createElement(getCategoryIcon(selectedCategory), { 
+                    className: `h-6 w-6 ${categories.find(c => c.category === selectedCategory)?.color}` 
+                  })}
+                  <DialogTitle className="text-xl">
+                    {categories.find(c => c.category === selectedCategory)?.name} ({getSelectedLeads().length})
+                  </DialogTitle>
+                </>
+              )}
+            </div>
+          </DialogHeader>
+          
+          <div className="overflow-y-auto max-h-[60vh] pr-2">
+            <div className="space-y-4">
+              {getSelectedLeads().map((lead) => (
+                <Card key={lead.id} className="p-4 border border-border">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-primary" />
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <TrendingUp className="h-3 w-3" />
-                        {lead.engagement}
+                      <div>
+                        <h4 className="font-semibold text-foreground">{lead.username}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary">{lead.platform}</Badge>
+                          <Badge variant={lead.category === 'hot' ? 'destructive' : lead.category === 'warm' ? 'default' : 'outline'}>
+                            {lead.category}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                      {lead.content}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs font-medium">Score:</span>
-                        <span className={`text-xs font-bold ${categoryData.color}`}>
-                          {lead.urgencyScore.toFixed(1)}
-                        </span>
+                    <div className="text-right">
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{lead.engagement.toLocaleString()}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => window.open(lead.profileUrl, '_blank')}
-                        className="h-6 px-2 text-xs"
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
+                      <div className="text-xs text-muted-foreground">
+                        Score: <span className="font-bold">{lead.urgencyScore.toFixed(1)}</span>
+                      </div>
                     </div>
                   </div>
-                ))}
-                
-                {categoryData.leads.length > 5 && (
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    View All {categoryData.leads.length} Leads
-                  </Button>
-                )}
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-foreground leading-relaxed">
+                      {lead.content}
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">
+                      Platform: {lead.platform}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(lead.profileUrl, '_blank')}
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View Profile
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+              
+              {getSelectedLeads().length === 0 && selectedCategory && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    {React.createElement(getCategoryIcon(selectedCategory), { 
+                      className: 'h-8 w-8 text-muted-foreground' 
+                    })}
+                  </div>
+                  <p className="text-muted-foreground">
+                    No {selectedCategory} leads found
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
