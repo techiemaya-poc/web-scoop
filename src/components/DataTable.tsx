@@ -1,11 +1,38 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Filter, Search, ExternalLink, User, MessageCircle, Flame, Thermometer, Snowflake } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  IconButton,
+  Box,
+  Typography,
+  InputAdornment,
+  Pagination,
+  Card,
+  CardContent,
+} from '@mui/material';
+import {
+  Download,
+  FilterList,
+  Search,
+  Launch,
+  Person,
+  Chat,
+  LocalFireDepartment,
+  DeviceThermostat,
+  AcUnit,
+} from '@mui/icons-material';
 
 interface ScrapedData {
   id: string;
@@ -118,183 +145,167 @@ export const DataTable = ({ data: propData }: DataTableProps) => {
   };
 
   return (
-    <Card className="p-6 bg-card shadow-card border border-border">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold">Scraped Data Results</h2>
-            <p className="text-muted-foreground">{filteredData.length} total results</p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => handleExport('csv')} 
-              variant="outline"
-              className="transition-smooth hover:shadow-glow"
-            >
-              <Download className="h-4 w-4 mr-2" />
+    <Card>
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Scraped Data Results
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {filteredData.length} total results
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button variant="outlined" startIcon={<Download />} onClick={() => handleExport('csv')}>
               Export CSV
             </Button>
-            <Button 
-              onClick={() => handleExport('json')} 
-              variant="outline"
-              className="transition-smooth hover:shadow-glow"
-            >
-              <Download className="h-4 w-4 mr-2" />
+            <Button variant="outlined" startIcon={<Download />} onClick={() => handleExport('json')}>
               Export JSON
             </Button>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by username or content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 transition-smooth focus:shadow-glow"
-            />
-          </div>
-          
-          <Select value={platformFilter} onValueChange={setPlatformFilter}>
-            <SelectTrigger className="w-full sm:w-48 transition-smooth focus:shadow-glow">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="All Platforms" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Platforms</SelectItem>
-              <SelectItem value="twitter">Twitter</SelectItem>
-              <SelectItem value="linkedin">LinkedIn</SelectItem>
-              <SelectItem value="reddit">Reddit</SelectItem>
-              <SelectItem value="instagram">Instagram</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+          <TextField
+            placeholder="Search by username or content..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ flex: 1 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Platform</InputLabel>
+            <Select
+              value={platformFilter}
+              label="Platform"
+              onChange={(e) => setPlatformFilter(e.target.value)}
+            >
+              <MenuItem value="all">All Platforms</MenuItem>
+              <MenuItem value="twitter">Twitter</MenuItem>
+              <MenuItem value="linkedin">LinkedIn</MenuItem>
+              <MenuItem value="reddit">Reddit</MenuItem>
+              <MenuItem value="instagram">Instagram</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
 
-        {/* Table */}
-        <div className="border rounded-lg overflow-hidden">
+        <TableContainer component={Paper}>
           <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>User</TableHead>
-                <TableHead>Platform</TableHead>
-                <TableHead>Content Preview</TableHead>
-                <TableHead>Engagement</TableHead>
-                <TableHead>Lead Score</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Actions</TableHead>
+            <TableHead>
+              <TableRow>
+                <TableCell>User</TableCell>
+                <TableCell>Platform</TableCell>
+                <TableCell>Content Preview</TableCell>
+                <TableCell>Engagement</TableCell>
+                <TableCell>Lead Score</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            </TableHeader>
+            </TableHead>
             <TableBody>
               {paginatedData.map((item) => {
                 const leadData = categorizeLeadFromContent(item.postContent, item.engagement);
                 const getCategoryIcon = (category: string) => {
                   switch (category) {
-                    case 'hot': return Flame;
-                    case 'warm': return Thermometer;
-                    case 'cold': return Snowflake;
-                    default: return MessageCircle;
+                    case 'hot': return LocalFireDepartment;
+                    case 'warm': return DeviceThermostat;
+                    case 'cold': return AcUnit;
+                    default: return Chat;
                   }
                 };
                 const getCategoryColor = (category: string) => {
                   switch (category) {
-                    case 'hot': return 'text-red-500';
-                    case 'warm': return 'text-orange-500';
-                    case 'cold': return 'text-blue-500';
-                    default: return 'text-muted-foreground';
+                    case 'hot': return 'error';
+                    case 'warm': return 'warning';
+                    case 'cold': return 'info';
+                    default: return 'default';
                   }
                 };
                 const Icon = getCategoryIcon(leadData.category);
                 
                 return (
-                <TableRow key={item.id} className="hover:bg-muted/30 transition-smooth">
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      {item.username}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{item.platform}</Badge>
-                  </TableCell>
-                  <TableCell className="max-w-xs">
-                    <p className="truncate text-sm">{item.postContent}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                      {item.engagement.toLocaleString()}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Icon className={`h-4 w-4 ${getCategoryColor(leadData.category)}`} />
-                      <Badge 
-                        variant={leadData.category === 'hot' ? 'destructive' : leadData.category === 'warm' ? 'default' : 'secondary'}
-                        className="capitalize"
+                  <TableRow key={item.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Person fontSize="small" />
+                        {item.username}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={item.platform} size="small" />
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Typography variant="body2" noWrap>
+                        {item.postContent}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chat fontSize="small" />
+                        {item.engagement.toLocaleString()}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Icon fontSize="small" />
+                        <Chip 
+                          label={leadData.category.toUpperCase()}
+                          size="small"
+                          color={getCategoryColor(leadData.category) as any}
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          {leadData.score.toFixed(1)}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{item.location || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatTimestamp(item.timestamp)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={item.postType}
+                        size="small"
+                        variant={item.postType === 'post' ? 'filled' : 'outlined'}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        onClick={() => window.open(item.profileUrl, '_blank')}
                       >
-                        {leadData.category}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {leadData.score.toFixed(1)}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{item.location || 'N/A'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatTimestamp(item.timestamp)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={item.postType === 'post' ? 'default' : 'outline'}>
-                      {item.postType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => window.open(item.profileUrl, '_blank')}
-                      className="transition-smooth hover:shadow-glow"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )})}
+                        <Launch />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
-        </div>
+        </TableContainer>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="transition-smooth"
-            >
-              Previous
-            </Button>
-            <span className="flex items-center px-4 text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="transition-smooth"
-            >
-              Next
-            </Button>
-          </div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={(e, page) => setCurrentPage(page)}
+              color="primary"
+            />
+          </Box>
         )}
-      </div>
+      </CardContent>
     </Card>
   );
 };

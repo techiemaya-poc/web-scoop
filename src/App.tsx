@@ -6,6 +6,12 @@ import { SnackbarProvider } from 'notistack';
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopHeader } from "@/components/TopHeader";
 import { Dashboard } from "./pages/Dashboard";
+import { LeadMining } from "./pages/LeadMining";
+import { Contacts } from "./pages/Contacts";
+import { ChatEngagement } from "./pages/ChatEngagement";
+import { Customer360 } from "./pages/Customer360";
+import { ProjectManagement } from "./pages/ProjectManagement";
+import { AnalyticsDashboard } from "./pages/AnalyticsDashboard";
 import { Settings } from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { theme } from "./theme/theme";
@@ -27,13 +33,13 @@ const App = () => (
               <main style={{ flexGrow: 1, padding: '24px' }}>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
-                  <Route path="/scraper" element={<Dashboard />} />
+                  <Route path="/scraper" element={<LeadMining />} />
                   <Route path="/data" element={<Dashboard />} />
-                  <Route path="/analytics" element={<Dashboard />} />
-                  <Route path="/projects" element={<Dashboard />} />
-                  <Route path="/contacts" element={<Dashboard />} />
-                  <Route path="/conversations" element={<Dashboard />} />
-                  <Route path="/workspace" element={<Dashboard />} />
+                  <Route path="/analytics" element={<AnalyticsDashboard />} />
+                  <Route path="/projects" element={<ProjectManagement />} />
+                  <Route path="/contacts" element={<Contacts />} />
+                  <Route path="/conversations" element={<ChatEngagement />} />
+                  <Route path="/workspace" element={<Customer360 />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
